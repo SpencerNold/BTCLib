@@ -168,7 +168,7 @@ public class MethodTransformVisitor extends MethodVisitor {
                 if (parameter.isAnnotationPresent(Local.class)) {
                     Local load = parameter.getAnnotation(Local.class);
                     int opcode = load.type().getOpcode();
-                    int local = load.localIndex();
+                    int local = load.index();
                     mv.visitVarInsn(opcode, local);
                     continue;
                 }

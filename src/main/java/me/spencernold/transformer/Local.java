@@ -12,7 +12,7 @@ import java.lang.annotation.Target;
 public @interface Local {
 
     Type type();
-    int localIndex();
+    int index();
 
     enum Type {
         ADDRESS(Opcodes.ALOAD), INTEGER(Opcodes.ILOAD), LONG(Opcodes.LLOAD), FLOAT(Opcodes.FLOAD), DOUBLE(Opcodes.DLOAD);

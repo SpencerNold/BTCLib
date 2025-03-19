@@ -1,5 +1,7 @@
 import me.spencernold.transformer.*;
 import org.junit.jupiter.api.Test;
+import util.ByteCodeClassLoader;
+import util.InputStreams;
 
 import java.io.InputStream;
 
@@ -9,7 +11,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 public class LoadInsnTestCase {
 
     @Injector(name = "test()V", target = Target.TAIL)
-    public void onTest(Object test, @Local(type = Local.Type.INTEGER, localIndex = 1) int i, Callback callback) {
+    public void onTest(Object test, @Local(type = Local.Type.INTEGER, index = 1) int i, Callback callback) {
         System.out.println(i);
     }
 
