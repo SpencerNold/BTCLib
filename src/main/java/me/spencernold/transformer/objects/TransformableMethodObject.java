@@ -27,28 +27,6 @@ public class TransformableMethodObject {
         this.ordinal = ordinal;
     }
 
-    public List<Pair<Integer, Integer>> getLoadParameterInstructions() {
-        List<Pair<Integer, Integer>> list = new ArrayList<>();
-        int index = 1;
-        int count = transformerMethod.getParameterCount() - 1;
-        for (int i = 1; i < count; i++) {
-            Parameter param = transformerMethod.getParameters()[i];
-            Class<?> type = param.getType();
-            int insn = Opcodes.ALOAD;
-            if (type == byte.class || type == short.class || type == int.class || type == boolean.class)
-                insn = Opcodes.ILOAD;
-            if (type == long.class)
-                insn = Opcodes.LLOAD;
-            if (type == float.class)
-                insn = Opcodes.FLOAD;
-            if (type == double.class)
-                insn = Opcodes.DLOAD;
-            list.add(new Pair<>(insn, index));
-            index += (type == double.class || type == long.class) ? 2 : 1;
-        }
-        return list;
-    }
-
     public int getReturnType() {
         if (methodName.endsWith("V"))
             return Opcodes.RETURN;
@@ -63,14 +41,6 @@ public class TransformableMethodObject {
         else if (methodName.endsWith("D"))
             return Opcodes.DRETURN;
         return -1;
-    }
-
-    public String getTransformerMethodName() {
-        return transformerMethod.getName();
-    }
-
-    public String getTransformerMethodDescriptor() {
-        return Type.getMethodDescriptor(transformerMethod);
     }
 
     public Class<?> getTransformerClass() {

@@ -25,7 +25,11 @@ public class ClassAdapter {
     private final Class<? extends MethodNameAdapter> defaultMethodAdapter;
 
     public ClassAdapter() {
-        this(Opcodes.V23, null, null);
+        this(Opcodes.V23);
+    }
+
+    public ClassAdapter(int maxSupportedASMJavaVersion) {
+        this(maxSupportedASMJavaVersion, null, null);
     }
 
     public ClassAdapter(int maxSupportedASMJavaVersion, Class<? extends ClassNameAdapter> defaultClassAdapter, Class<? extends MethodNameAdapter> defaultMethodAdapter) {

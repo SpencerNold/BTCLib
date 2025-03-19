@@ -1,14 +1,13 @@
 package me.spencernold.transformer.visitors;
 
 import me.spencernold.transformer.Callback;
+import me.spencernold.transformer.Local;
 import me.spencernold.transformer.Target;
 import me.spencernold.transformer.objects.TransformableMethodObject;
-import me.spencernold.transformer.struct.Pair;
-import org.objectweb.asm.Handle;
-import org.objectweb.asm.Label;
-import org.objectweb.asm.MethodVisitor;
-import org.objectweb.asm.Opcodes;
+import org.objectweb.asm.*;
 
+import java.lang.reflect.Method;
+import java.lang.reflect.Parameter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -161,10 +160,33 @@ public class MethodTransformVisitor extends MethodVisitor {
             mv.visitMethodInsn(Opcodes.INVOKESPECIAL, transformerClassName, "<init>", "()V", false);
             // TransformerClass::onFunction
             mv.visitVarInsn(ALOAD, 0);
-            for (Pair<Integer, Integer> insn : method.getLoadParameterInstructions())
-                mv.visitVarInsn(insn.getKey(), insn.getValue());
+            Method transformerMethod = method.getTransformerMethod();
+            int index = 1;
+            int count = transformerMethod.getParameterCount() - 1;
+            for (int i = 1; i < count; i++) {
+                Parameter parameter = transformerMethod.getParameters()[i];
+                if (parameter.isAnnotationPresent(Local.class)) {
+                    Local load = parameter.getAnnotation(Local.class);
+                    int opcode = load.type().getOpcode();
+                    int local = load.localIndex();
+                    mv.visitVarInsn(opcode, local);
+                    continue;
+                }
+                Class<?> type = parameter.getType();
+                int insn = Opcodes.ALOAD;
+                if (type == byte.class || type == short.class || type == int.class || type == boolean.class)
+                    insn = Opcodes.ILOAD;
+                if (type == long.class)
+                    insn = Opcodes.LLOAD;
+                if (type == float.class)
+                    insn = Opcodes.FLOAD;
+                if (type == double.class)
+                    insn = Opcodes.DLOAD;
+                mv.visitVarInsn(insn, index);
+                index += (type == double.class || type == long.class) ? 2 : 1;
+            }
             mv.visitVarInsn(Opcodes.ALOAD, localIndex);
-            mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, transformerClassName, method.getTransformerMethodName(), method.getTransformerMethodDescriptor(), false);
+            mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, transformerClassName, transformerMethod.getName(), Type.getMethodDescriptor(transformerMethod), false);
             // s = Callback::isNotCanceled
             mv.visitVarInsn(Opcodes.ALOAD, localIndex);
             mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, callbackClassName, "isNotCanceled", "()Z", false);
