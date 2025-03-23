@@ -15,7 +15,7 @@ public @interface Injector {
     String name();
 
     int opcode() default 0; // NOP
-    int ordinal() default 0;
+    int ordinal() default 0; // 1 (first instance of opcode)
 
     Class<? extends MethodNameAdapter> adapter() default GenericMethodNameAdapterImpl.class;
 }

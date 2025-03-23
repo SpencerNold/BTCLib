@@ -15,7 +15,7 @@ public @interface Local {
     int index();
 
     enum Type {
-        ADDRESS(Opcodes.ALOAD), INTEGER(Opcodes.ILOAD), LONG(Opcodes.LLOAD), FLOAT(Opcodes.FLOAD), DOUBLE(Opcodes.DLOAD);
+        ALOAD(Opcodes.ALOAD), ILOAD(Opcodes.ILOAD), LLOAD(Opcodes.LLOAD), FLOAD(Opcodes.FLOAD), DLOAD(Opcodes.DLOAD);
 
         private final int opcode;
 

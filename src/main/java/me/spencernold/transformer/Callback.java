@@ -11,4 +11,6 @@ public class Callback {
     public boolean isNotCanceled() {
         return !cancel;
     }
+
+
 }
