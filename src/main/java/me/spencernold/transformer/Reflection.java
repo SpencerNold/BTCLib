@@ -3,11 +3,9 @@ package me.spencernold.transformer;
 import me.spencernold.transformer.adapters.ClassNameAdapter;
 import me.spencernold.transformer.adapters.FieldNameAdapter;
 import me.spencernold.transformer.adapters.MethodNameAdapter;
-import me.spencernold.transformer.struct.Pair;
 import org.objectweb.asm.Type;
 
 import java.lang.reflect.*;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -74,6 +72,10 @@ public class Reflection {
         }
     }
 
+    public static Object init(String className, String descriptor, Object... args) {
+        return init(getClassInstance(className), descriptor, args);
+    }
+
     public static Object getValue(Class<?> clazz, Object object, String fieldName) {
         String className = clazz.getName();
         String targetName = className + "::" + fieldName;
@@ -93,8 +95,16 @@ public class Reflection {
         }
     }
 
+    public static Object getValue(String className, Object object, String fieldName) {
+        return getValue(getClassInstance(className), object, fieldName);
+    }
+
     public static Object getStaticValue(Class<?> clazz, String fieldName) {
         return getValue(clazz, null, fieldName);
+    }
+
+    public static Object getStaticValue(String className, String fieldName) {
+        return getStaticValue(getClassInstance(className), fieldName);
     }
 
     public static void setValue(Class<?> clazz, Object object, String fieldName, Object value) {
@@ -116,8 +126,16 @@ public class Reflection {
         }
     }
 
+    public static void setValue(String className, Object object, String fieldName, Object value) {
+        setValue(getClassInstance(className), object, fieldName, value);
+    }
+
     public static void setStaticValue(Class<?> clazz, String fieldName, Object value) {
         setValue(clazz, null, fieldName, value);
+    }
+
+    public static void setStaticValue(String className, String fieldName, Object value) {
+        setStaticValue(getClassInstance(className), fieldName, value);
     }
 
     public static Object call(Class<?> clazz, Object object, String methodName, String descriptor, Object... args) {
@@ -140,8 +158,16 @@ public class Reflection {
         }
     }
 
+    public static Object call(String className, Object object, String methodName, String descriptor, Object... args) {
+        return call(getClassInstance(className), object, methodName, descriptor, args);
+    }
+
     public static Object callStatic(Class<?> clazz, String methodName, String descriptor, Object... args) {
         return call(clazz, null, methodName, descriptor, args);
+    }
+
+    public static Object callStatic(String className, String methodName, String descriptor, Object... args) {
+        return callStatic(getClassInstance(className), methodName, descriptor, args);
     }
 
     public static void setSystemReflectClass(Reflection reflection) {
@@ -176,6 +202,15 @@ public class Reflection {
             }
         }
         return classes;
+    }
+
+    private static Class<?> getClassInstance(String className) {
+        className = systemReflectClass.translateClassName(className);
+        try {
+            return Class.forName(className);
+        } catch (ClassNotFoundException e) {
+            throw new ReflectionException(e);
+        }
     }
 
     public static class ReflectionException extends RuntimeException {
