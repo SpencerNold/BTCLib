@@ -34,14 +34,14 @@ public class Reflection {
     private String translateMethodName(String className, String methodName) {
         if (methodNameAdapter == null)
             return methodName;
-        MethodNameAdapter adapter = init(methodNameAdapter, "(S)V", className);
+        MethodNameAdapter adapter = init(methodNameAdapter, "(Ljava.lang.String;)V", className);
         return adapter.adapt(methodName);
     }
 
     private String translateFieldName(String className, String fieldName) {
         if (fieldNameAdapter == null)
             return fieldName;
-        FieldNameAdapter adapter = init(fieldNameAdapter, "(S)V", className);
+        FieldNameAdapter adapter = init(fieldNameAdapter, "(Ljava.lang.String;)V", className);
         return adapter.adapt(fieldName);
     }
 
