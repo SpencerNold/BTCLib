@@ -76,10 +76,10 @@ public class Reflection {
         return init(getClassInstance(className), descriptor, args);
     }
 
-    public static Object getValue(Class<?> clazz, Object object, String fieldName) {
-        String className = clazz.getName();
+    public static Object getValue(String className, Object object, String fieldName) {
         String targetName = className + "::" + fieldName;
         try {
+            Class<?> clazz = Class.forName(systemReflectClass.translateClassName(className));
             AccessibleObject accessible = systemReflectClass.loadObject(targetName);
             Field field;
             if (accessible == null) {
@@ -90,27 +90,19 @@ public class Reflection {
             } else
                 field = (Field) accessible;
             return field.get(object);
-        } catch (NoSuchFieldException | IllegalAccessException e) {
+        } catch (NoSuchFieldException | IllegalAccessException | ClassNotFoundException e) {
             throw new ReflectionException(e);
         }
     }
 
-    public static Object getValue(String className, Object object, String fieldName) {
-        return getValue(getClassInstance(className), object, fieldName);
-    }
-
-    public static Object getStaticValue(Class<?> clazz, String fieldName) {
-        return getValue(clazz, null, fieldName);
-    }
-
     public static Object getStaticValue(String className, String fieldName) {
-        return getStaticValue(getClassInstance(className), fieldName);
+        return getValue(className, null, fieldName);
     }
 
-    public static void setValue(Class<?> clazz, Object object, String fieldName, Object value) {
-        String className = clazz.getName();
+    public static void setValue(String className, Object object, String fieldName, Object value) {
         String targetName = className + "::" + fieldName;
         try {
+            Class<?> clazz = Class.forName(systemReflectClass.translateClassName(className));
             AccessibleObject accessible = systemReflectClass.loadObject(targetName);
             Field field;
             if (accessible == null) {
@@ -121,21 +113,13 @@ public class Reflection {
             } else
                 field = (Field) accessible;
             field.set(object, value);
-        } catch (NoSuchFieldException | IllegalAccessException e) {
+        } catch (NoSuchFieldException | IllegalAccessException | ClassNotFoundException e) {
             throw new ReflectionException(e);
         }
     }
 
-    public static void setValue(String className, Object object, String fieldName, Object value) {
-        setValue(getClassInstance(className), object, fieldName, value);
-    }
-
-    public static void setStaticValue(Class<?> clazz, String fieldName, Object value) {
-        setValue(clazz, null, fieldName, value);
-    }
-
     public static void setStaticValue(String className, String fieldName, Object value) {
-        setStaticValue(getClassInstance(className), fieldName, value);
+        setValue(className, null, fieldName, value);
     }
 
     public static Object call(Class<?> clazz, Object object, String methodName, String descriptor, Object... args) {
