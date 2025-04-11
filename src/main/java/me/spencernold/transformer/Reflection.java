@@ -76,10 +76,10 @@ public class Reflection {
         return init(getClassInstance(className), descriptor, args);
     }
 
-    public static Object getValue(Class<?> clazz, Object object, String fieldName) {
-        String className = clazz.getName();
+    public static Object getValue(String className, Object object, String fieldName) {
         String targetName = className + "::" + fieldName;
         try {
+            Class<?> clazz = getClassInstance(className);
             AccessibleObject accessible = systemReflectClass.loadObject(targetName);
             Field field;
             if (accessible == null) {
@@ -95,22 +95,14 @@ public class Reflection {
         }
     }
 
-    public static Object getValue(String className, Object object, String fieldName) {
-        return getValue(getClassInstance(className), object, fieldName);
-    }
-
-    public static Object getStaticValue(Class<?> clazz, String fieldName) {
-        return getValue(clazz, null, fieldName);
-    }
-
     public static Object getStaticValue(String className, String fieldName) {
-        return getStaticValue(getClassInstance(className), fieldName);
+        return getValue(className, null, fieldName);
     }
 
-    public static void setValue(Class<?> clazz, Object object, String fieldName, Object value) {
-        String className = clazz.getName();
+    public static void setValue(String className, Object object, String fieldName, Object value) {
         String targetName = className + "::" + fieldName;
         try {
+            Class<?> clazz = getClassInstance(className);
             AccessibleObject accessible = systemReflectClass.loadObject(targetName);
             Field field;
             if (accessible == null) {
@@ -126,22 +118,14 @@ public class Reflection {
         }
     }
 
-    public static void setValue(String className, Object object, String fieldName, Object value) {
-        setValue(getClassInstance(className), object, fieldName, value);
-    }
-
-    public static void setStaticValue(Class<?> clazz, String fieldName, Object value) {
-        setValue(clazz, null, fieldName, value);
-    }
-
     public static void setStaticValue(String className, String fieldName, Object value) {
-        setStaticValue(getClassInstance(className), fieldName, value);
+        setValue(className, null, fieldName, value);
     }
 
-    public static Object call(Class<?> clazz, Object object, String methodName, String descriptor, Object... args) {
-        String className = clazz.getName();
+    public static Object call(String className, Object object, String methodName, String descriptor, Object... args) {
         String targetName = className + "::" + methodName + descriptor;
         try {
+            Class<?> clazz = getClassInstance(className);
             AccessibleObject accessible = systemReflectClass.loadObject(targetName);
             Method method;
             if (accessible == null) {
@@ -158,16 +142,8 @@ public class Reflection {
         }
     }
 
-    public static Object call(String className, Object object, String methodName, String descriptor, Object... args) {
-        return call(getClassInstance(className), object, methodName, descriptor, args);
-    }
-
-    public static Object callStatic(Class<?> clazz, String methodName, String descriptor, Object... args) {
-        return call(clazz, null, methodName, descriptor, args);
-    }
-
     public static Object callStatic(String className, String methodName, String descriptor, Object... args) {
-        return callStatic(getClassInstance(className), methodName, descriptor, args);
+        return call(className, null, methodName, descriptor, args);
     }
 
     public static void setSystemReflectClass(Reflection reflection) {
