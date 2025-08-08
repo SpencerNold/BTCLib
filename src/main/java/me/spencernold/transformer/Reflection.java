@@ -171,7 +171,7 @@ public class Reflection {
                 classes[i] = double.class;
             else {
                 try {
-                    classes[i] = Class.forName(systemReflectClass.translateClassName(name.replace('.', '/')));
+                    classes[i] = Class.forName(systemReflectClass.translateClassName(name));
                 } catch (ClassNotFoundException e) {
                     throw new ReflectionException(e);
                 }
