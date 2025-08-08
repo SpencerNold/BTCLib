@@ -131,7 +131,7 @@ public class Reflection {
             if (accessible == null) {
                 methodName = systemReflectClass.translateMethodName(className, methodName + descriptor);
                 Class<?>[] params = getParametersFromDescriptor(descriptor);
-                method = clazz.getDeclaredMethod(methodName.replace(descriptor, ""), params);
+                method = clazz.getDeclaredMethod(methodName.replaceAll("\\(.*?\\).+?$", ""), params);
                 method.setAccessible(true);
                 systemReflectClass.storeObject(targetName, method);
             } else
@@ -173,7 +173,6 @@ public class Reflection {
                 try {
                     classes[i] = Class.forName(systemReflectClass.translateClassName(name));
                 } catch (ClassNotFoundException e) {
-                    throw new ReflectionException(e);
                 }
             }
         }
