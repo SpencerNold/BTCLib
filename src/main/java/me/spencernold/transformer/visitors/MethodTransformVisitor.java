@@ -1,7 +1,7 @@
 package me.spencernold.transformer.visitors;
 
 import me.spencernold.transformer.Callback;
-import me.spencernold.transformer.Local;
+import me.spencernold.transformer.LoadLocal;
 import me.spencernold.transformer.Target;
 import me.spencernold.transformer.objects.TransformableMethodObject;
 import org.objectweb.asm.*;
@@ -165,8 +165,8 @@ public class MethodTransformVisitor extends MethodVisitor {
             int count = transformerMethod.getParameterCount() - 1;
             for (int i = 1; i < count; i++) {
                 Parameter parameter = transformerMethod.getParameters()[i];
-                if (parameter.isAnnotationPresent(Local.class)) {
-                    Local load = parameter.getAnnotation(Local.class);
+                if (parameter.isAnnotationPresent(LoadLocal.class)) {
+                    LoadLocal load = parameter.getAnnotation(LoadLocal.class);
                     int opcode = load.type().getOpcode();
                     int local = load.index();
                     mv.visitVarInsn(opcode, local);

@@ -16,7 +16,7 @@ public class OpcodeTargetTest {
     private ByteArrayOutputStream out;
 
     @Injector(name = "test()V", target = Target.OPCODE, opcode = Opcodes.ISTORE, ordinal = 1)
-    public void onTest(Object test, @Local(type = Local.Type.ILOAD, index = 1) int i, Callback callback) {
+    public void onTest(Object test, @LoadLocal(type = LoadLocal.Type.ILOAD, index = 1) int i, Callback callback) {
         System.out.println(i);
     }
 

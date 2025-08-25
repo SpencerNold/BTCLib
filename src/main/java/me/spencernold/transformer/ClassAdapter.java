@@ -9,6 +9,7 @@ import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.Opcodes;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.HashMap;
@@ -47,7 +48,7 @@ public class ClassAdapter {
             Class<? extends ClassNameAdapter> classNameAdapter = defaultClassAdapter == null ? transformer.adapter() : defaultClassAdapter;
             className = classNameAdapter.getDeclaredConstructor().newInstance().adapt(className);
             if (transformer.initialize())
-                Class.forName(className);
+                Class.forName(className, true, getClass().getClassLoader());
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
             throw new ClassTransformException(e, "failed to adapt %s", className);
         } catch (ClassNotFoundException e) {
@@ -95,7 +96,7 @@ public class ClassAdapter {
 
     private Class<?> forNameUnsafe(String className) {
         try {
-            return Class.forName(className);
+            return Class.forName(className, true, getClass().getClassLoader());
         } catch (ClassNotFoundException e) {
             throw new RuntimeException(e);
         }
