@@ -96,7 +96,7 @@ public class ClassAdapter {
 
     private Class<?> forNameUnsafe(String className) {
         try {
-            return Class.forName(className, true, getClass().getClassLoader());
+            return Class.forName(className);
         } catch (ClassNotFoundException e) {
             throw new RuntimeException(e);
         }
