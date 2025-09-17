@@ -9,7 +9,6 @@ import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.Opcodes;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.HashMap;
@@ -25,16 +24,19 @@ public class ClassAdapter {
     private final Class<? extends ClassNameAdapter> defaultClassAdapter;
     private final Class<? extends MethodNameAdapter> defaultMethodAdapter;
 
+    private final int api;
+
     public ClassAdapter() {
-        this(Opcodes.V23);
+        this(Opcodes.V23, Opcodes.ASM9);
     }
 
-    public ClassAdapter(int maxSupportedASMJavaVersion) {
-        this(maxSupportedASMJavaVersion, null, null);
+    public ClassAdapter(int maxSupportedASMJavaVersion, int api) {
+        this(maxSupportedASMJavaVersion, api, null, null);
     }
 
-    public ClassAdapter(int maxSupportedASMJavaVersion, Class<? extends ClassNameAdapter> defaultClassAdapter, Class<? extends MethodNameAdapter> defaultMethodAdapter) {
+    public ClassAdapter(int maxSupportedASMJavaVersion, int api, Class<? extends ClassNameAdapter> defaultClassAdapter, Class<? extends MethodNameAdapter> defaultMethodAdapter) {
         this.asmMaxMajorVersion = maxSupportedASMJavaVersion;
+        this.api = api;
         this.defaultClassAdapter = defaultClassAdapter;
         this.defaultMethodAdapter = defaultMethodAdapter;
     }
@@ -49,7 +51,8 @@ public class ClassAdapter {
             className = classNameAdapter.getDeclaredConstructor().newInstance().adapt(className);
             if (transformer.initialize())
                 Class.forName(className, true, getClass().getClassLoader());
-        } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
+        } catch (InstantiationException | IllegalAccessException | InvocationTargetException |
+                 NoSuchMethodException e) {
             throw new ClassTransformException(e, "failed to adapt %s", className);
         } catch (ClassNotFoundException e) {
             throw new ClassTransformException(e, "class does not exist to transform %s", className);
@@ -65,7 +68,8 @@ public class ClassAdapter {
             try {
                 Class<? extends MethodNameAdapter> methodNameAdapter = defaultMethodAdapter == null ? injector.adapter() : defaultMethodAdapter;
                 methodName = methodNameAdapter.getDeclaredConstructor(String.class).newInstance(transformer.className()).adapt(methodName);
-            } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
+            } catch (InstantiationException | IllegalAccessException | InvocationTargetException |
+                     NoSuchMethodException e) {
                 throw new ClassTransformException(e, "failed to adapt %s::%s", className, methodName);
             }
             object.add(methodName, new TransformableMethodObject(clazz, methodName, method, injector.target(), injector.opcode(), injector.ordinal()));
@@ -80,9 +84,10 @@ public class ClassAdapter {
         clampMajorVersion(byteCode, 0, asmMaxMajorVersion);
         ClassReader reader = new ClassReader(byteCode);
         ClassWriter writer = new ClassWriter(ClassWriter.COMPUTE_MAXS | ClassWriter.COMPUTE_FRAMES);
-        reader.accept(new ClassTransformVisitor(object, Opcodes.ASM9, writer), 0);
+        reader.accept(new ClassTransformVisitor(object, api, writer), 0);
         byteCode = writer.toByteArray();
         setMajorVersion(byteCode, version);
+        Logger.instance.print("transformed: " + className);
         return byteCode;
     }
 

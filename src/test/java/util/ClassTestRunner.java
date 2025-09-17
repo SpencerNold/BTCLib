@@ -1,5 +1,6 @@
 package util;
 
+import jdk.internal.org.objectweb.asm.Opcodes;
 import me.spencernold.transformer.ClassAdapter;
 
 import java.io.InputStream;
@@ -14,7 +15,7 @@ public class ClassTestRunner {
         byte[] bytes = InputStreams.readAllBytes(input);
         input.close();
 
-        ClassAdapter adapter = new ClassAdapter(52);
+        ClassAdapter adapter = new ClassAdapter(52, Opcodes.ASM5);
         adapter.registerTransformerClass(testClass);
         bytes = adapter.transform("Test", bytes);
         ByteCodeClassLoader loader = new ByteCodeClassLoader();
