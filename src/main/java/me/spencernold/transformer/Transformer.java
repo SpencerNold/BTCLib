@@ -13,6 +13,5 @@ import java.lang.annotation.Target;
 public @interface Transformer {
     String className();
 
-    boolean initialize() default false;
     Class<? extends ClassNameAdapter> adapter() default GenericClassNameAdapterImpl.class;
 }

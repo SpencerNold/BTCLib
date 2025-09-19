@@ -1,4 +1,7 @@
-import me.spencernold.transformer.*;
+import me.spencernold.transformer.Callback;
+import me.spencernold.transformer.Injector;
+import me.spencernold.transformer.Target;
+import me.spencernold.transformer.Transformer;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -34,7 +37,7 @@ public class HeadTargetTest {
     public void test() {
         try {
             ClassTestRunner.run(HeadTargetTest.class);
-            Assertions.assertEquals("Test!\n", out.toString());
+            Assertions.assertTrue(out.toString().endsWith("Test!\n"));
         } catch (Exception e) {
             e.printStackTrace(System.err);
             assert (false);

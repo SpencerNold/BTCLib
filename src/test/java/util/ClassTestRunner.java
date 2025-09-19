@@ -1,7 +1,7 @@
 package util;
 
-import jdk.internal.org.objectweb.asm.Opcodes;
 import me.spencernold.transformer.ClassAdapter;
+import org.objectweb.asm.Opcodes;
 
 import java.io.InputStream;
 

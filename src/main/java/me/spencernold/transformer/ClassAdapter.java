@@ -11,10 +11,10 @@ import org.objectweb.asm.Opcodes;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 public class ClassAdapter {
 
@@ -49,13 +49,9 @@ public class ClassAdapter {
         try {
             Class<? extends ClassNameAdapter> classNameAdapter = defaultClassAdapter == null ? transformer.adapter() : defaultClassAdapter;
             className = classNameAdapter.getDeclaredConstructor().newInstance().adapt(className);
-            if (transformer.initialize())
-                Class.forName(className, true, getClass().getClassLoader());
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException |
                  NoSuchMethodException e) {
             throw new ClassTransformException(e, "failed to adapt %s", className);
-        } catch (ClassNotFoundException e) {
-            throw new ClassTransformException(e, "class does not exist to transform %s", className);
         }
         if (!transformers.containsKey(className))
             transformers.put(className, new TransformableClassObject());
@@ -95,16 +91,8 @@ public class ClassAdapter {
         transformers.clear();
     }
 
-    public List<Class<?>> getClassesToTransform() {
-        return transformers.keySet().stream().map(this::forNameUnsafe).collect(Collectors.toList());
-    }
-
-    private Class<?> forNameUnsafe(String className) {
-        try {
-            return Class.forName(className);
-        } catch (ClassNotFoundException e) {
-            throw new RuntimeException(e);
-        }
+    public List<String> getClassesToTransform() {
+        return new ArrayList<>(transformers.keySet());
     }
 
     private void clampMajorVersion(byte[] buffer, int min, int max) {
