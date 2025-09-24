@@ -1,16 +1,21 @@
 package me.spencernold.transformer;
 
-public interface Logger {
+public abstract class Logger {
 
-    Logger instance = System.out::println;
+    public static Logger instance = new Logger() {
+        @Override
+        public void print(String s) {
+            System.out.println(s);
+        }
+    };
 
-    void print(String s);
+    public abstract void print(String s);
 
-    default void printf(String s, Object... objects) {
+    public void printf(String s, Object... objects) {
         print(String.format(s, objects));
     }
 
-    default void print(Throwable throwable) {
+    public void print(Throwable throwable) {
         print(throwable.getClass().getName() + ": " + throwable.getMessage());
     }
 }
