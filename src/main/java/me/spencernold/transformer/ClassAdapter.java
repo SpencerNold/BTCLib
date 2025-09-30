@@ -73,6 +73,14 @@ public class ClassAdapter {
     }
 
     public byte[] transform(String className, byte[] byteCode) {
+        return this.transform(ClassLoader.getSystemClassLoader(), className, byteCode);
+    }
+
+    public byte[] transformWithThreadResolver(String className, byte[] byteCode) {
+        return this.transform(Thread.currentThread().getContextClassLoader(), className, byteCode);
+    }
+
+    public byte[] transform(ClassLoader resolver, String className, byte[] byteCode) {
         TransformableClassObject object = transformers.get(className);
         if (object == null)
             return byteCode;
@@ -80,7 +88,7 @@ public class ClassAdapter {
         clampMajorVersion(byteCode, 0, asmMaxMajorVersion);
         ClassReader reader = new ClassReader(byteCode);
         ClassWriter writer = new ClassWriter(ClassWriter.COMPUTE_MAXS | ClassWriter.COMPUTE_FRAMES);
-        reader.accept(new ClassTransformVisitor(object, api, writer), 0);
+        reader.accept(new ClassTransformVisitor(resolver, object, api, writer), 0);
         byteCode = writer.toByteArray();
         setMajorVersion(byteCode, version);
         Logger.instance.print("transformed: " + className);

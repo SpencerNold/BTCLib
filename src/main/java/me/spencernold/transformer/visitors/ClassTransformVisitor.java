@@ -9,10 +9,12 @@ import java.util.List;
 
 public class ClassTransformVisitor extends ClassVisitor {
 
+    private final ClassLoader resolver;
     private final TransformableClassObject classObject;
 
-    public ClassTransformVisitor(TransformableClassObject classObject, int api, ClassVisitor classVisitor) {
+    public ClassTransformVisitor(ClassLoader resolver, TransformableClassObject classObject, int api, ClassVisitor classVisitor) {
         super(api, classVisitor);
+        this.resolver = resolver;
         this.classObject = classObject;
     }
 
@@ -20,6 +22,6 @@ public class ClassTransformVisitor extends ClassVisitor {
     public MethodVisitor visitMethod(int access, String name, String descriptor, String signature, String[] exceptions) {
         MethodVisitor mv = super.visitMethod(access, name, descriptor, signature, exceptions);
         List<TransformableMethodObject> methodObjects = classObject.get(name + descriptor);
-        return new MethodTransformVisitor(methodObjects, name, descriptor, api, mv);
+        return new MethodTransformVisitor(resolver, methodObjects, name, descriptor, api, mv);
     }
 }

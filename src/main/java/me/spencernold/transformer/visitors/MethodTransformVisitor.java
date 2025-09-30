@@ -20,13 +20,16 @@ public class MethodTransformVisitor extends MethodVisitor {
     private final TargetProvider[] indices = new TargetProvider[256];
     private final HashMap<TargetProvider, List<TransformableMethodObject>> methods = new HashMap<>();
 
+    private final ClassLoader resolver;
+
     private final String name, desc;
 
     private int localIndex;
     private boolean isFirst;
 
-    public MethodTransformVisitor(List<TransformableMethodObject> methodObjects, String name, String desc, int api, MethodVisitor methodVisitor) {
+    public MethodTransformVisitor(ClassLoader resolver, List<TransformableMethodObject> methodObjects, String name, String desc, int api, MethodVisitor methodVisitor) {
         super(api, methodVisitor);
+        this.resolver = resolver;
         this.name = name;
         this.desc = desc;
         this.localIndex = VisitorTool.getFirstLocalPos(desc);
@@ -132,7 +135,7 @@ public class MethodTransformVisitor extends MethodVisitor {
                 transform(methodObjects);
             isFirst = false;
         }
-        if (opcode == RETURN || opcode == IRETURN  || opcode == LRETURN || opcode == FRETURN || opcode == DRETURN || opcode == ARETURN) {
+        if (opcode == RETURN || opcode == IRETURN || opcode == LRETURN || opcode == FRETURN || opcode == DRETURN || opcode == ARETURN) {
             List<TransformableMethodObject> methodObjects = methods.get(TargetProvider.TAIL);
             if (methodObjects != null)
                 transform(methodObjects);
@@ -148,7 +151,7 @@ public class MethodTransformVisitor extends MethodVisitor {
     private void transform(List<TransformableMethodObject> methodObjects) {
         for (TransformableMethodObject method : methodObjects) {
             // new Callback()
-            String callbackClassName = VisitorTool.getRawClassName(Callback.class);
+            String callbackClassName = "me/spencernold/transformer/Callback";
             mv.visitTypeInsn(Opcodes.NEW, callbackClassName);
             mv.visitInsn(Opcodes.DUP);
             mv.visitMethodInsn(Opcodes.INVOKESPECIAL, callbackClassName, "<init>", "()V", false);
@@ -198,6 +201,14 @@ public class MethodTransformVisitor extends MethodVisitor {
         }
     }
 
+    private Class<?> getClassOrNull(String name) {
+        try {
+            return Class.forName(name, true, resolver);
+        } catch (ClassNotFoundException e) {
+            return null;
+        }
+    }
+
     private static class TargetProvider {
 
         private static final TargetProvider HEAD = new TargetProvider(0, 0);
@@ -225,7 +236,7 @@ public class MethodTransformVisitor extends MethodVisitor {
 
         @Override
         public int hashCode() {
-            return Arrays.hashCode(new int[] { opcode, count });
+            return Arrays.hashCode(new int[]{opcode, count});
         }
 
         @Override
