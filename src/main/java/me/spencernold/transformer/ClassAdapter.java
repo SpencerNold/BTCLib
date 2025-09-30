@@ -87,7 +87,7 @@ public class ClassAdapter {
         int version = getMajorVersion(byteCode);
         clampMajorVersion(byteCode, 0, asmMaxMajorVersion);
         ClassReader reader = new ClassReader(byteCode);
-        ClassWriter writer = new ClassWriter(ClassWriter.COMPUTE_MAXS | ClassWriter.COMPUTE_FRAMES);
+        ClassWriter writer = new ResolvedClassWriter(resolver, ClassWriter.COMPUTE_MAXS | ClassWriter.COMPUTE_FRAMES);
         reader.accept(new ClassTransformVisitor(resolver, object, api, writer), 0);
         byteCode = writer.toByteArray();
         setMajorVersion(byteCode, version);

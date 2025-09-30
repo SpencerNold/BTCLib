@@ -1,6 +1,5 @@
 package me.spencernold.transformer.visitors;
 
-import me.spencernold.transformer.Callback;
 import me.spencernold.transformer.LoadLocal;
 import me.spencernold.transformer.Target;
 import me.spencernold.transformer.objects.TransformableMethodObject;
