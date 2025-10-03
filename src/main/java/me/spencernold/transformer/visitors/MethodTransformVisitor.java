@@ -22,15 +22,17 @@ public class MethodTransformVisitor extends MethodVisitor {
     private final ClassLoader resolver;
 
     private final String name, desc;
+    private final int access;
 
     private int localIndex;
     private boolean isFirst;
 
-    public MethodTransformVisitor(ClassLoader resolver, List<TransformableMethodObject> methodObjects, String name, String desc, int api, MethodVisitor methodVisitor) {
+    public MethodTransformVisitor(ClassLoader resolver, int access, List<TransformableMethodObject> methodObjects, String name, String desc, int api, MethodVisitor methodVisitor) {
         super(api, methodVisitor);
         this.resolver = resolver;
         this.name = name;
         this.desc = desc;
+        this.access = access;
         this.localIndex = VisitorTool.getFirstLocalPos(desc);
         this.isFirst = true;
         for (TransformableMethodObject method : methodObjects) {
@@ -161,7 +163,8 @@ public class MethodTransformVisitor extends MethodVisitor {
             mv.visitInsn(Opcodes.DUP);
             mv.visitMethodInsn(Opcodes.INVOKESPECIAL, transformerClassName, "<init>", "()V", false);
             // TransformerClass::onFunction
-            mv.visitVarInsn(ALOAD, 0);
+            if ((access & ACC_STATIC) == 0) // not static
+                mv.visitVarInsn(ALOAD, 0);
             Method transformerMethod = method.getTransformerMethod();
             int index = 1;
             int count = transformerMethod.getParameterCount() - 1;

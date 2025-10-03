@@ -22,6 +22,6 @@ public class ClassTransformVisitor extends ClassVisitor {
     public MethodVisitor visitMethod(int access, String name, String descriptor, String signature, String[] exceptions) {
         MethodVisitor mv = super.visitMethod(access, name, descriptor, signature, exceptions);
         List<TransformableMethodObject> methodObjects = classObject.get(name + descriptor);
-        return new MethodTransformVisitor(resolver, methodObjects, name, descriptor, api, mv);
+        return new MethodTransformVisitor(resolver, access, methodObjects, name, descriptor, api, mv);
     }
 }
