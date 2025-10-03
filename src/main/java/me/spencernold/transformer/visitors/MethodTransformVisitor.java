@@ -163,14 +163,15 @@ public class MethodTransformVisitor extends MethodVisitor {
             mv.visitInsn(Opcodes.DUP);
             mv.visitMethodInsn(Opcodes.INVOKESPECIAL, transformerClassName, "<init>", "()V", false);
             // TransformerClass::onFunction
-            if ((access & ACC_STATIC) == 0) {
+            boolean notStatic = (access & ACC_STATIC) == 0;
+            if (notStatic) {
                 // Not static
                 mv.visitVarInsn(ALOAD, 0);
             } else {
                 mv.visitInsn(ACONST_NULL);
             }
             Method transformerMethod = method.getTransformerMethod();
-            int index = 1;
+            int index = notStatic ? 1 : 0;
             int count = transformerMethod.getParameterCount() - 1;
             for (int i = 1; i < count; i++) {
                 Parameter parameter = transformerMethod.getParameters()[i];
